@@ -1,30 +1,29 @@
 class PlayerActions {
-    static func fightChoice(pkm1: Pokemon, pkm2: Pokemon, trainer: Trainer) {
-        var valid = false
-        while !valid {
-            battleUi.printBattle(pkm1: pkm1, pkm2: pkm2)
+    static func fightChoice(userPokemon: Pokemon, pcPokemon: Pokemon, trainer: Trainer) -> Bool {
+        while true {
+            battleUi.printBattle(pokemonB: userPokemon, pokemonF: pcPokemon)
             Menu.fightMenu(pokemon: trainer.getActivePokemon())
 
             let input = readLine() ?? "0"
             if let i = Int(input), i >= 1 && i <= 4 {
-                let move = pkm1.getMoves()[i - 1]
+                let move = userPokemon.getMoves()[i - 1]
                 if move.getPp() > 0 {
                     userUsedMove = move
                     userAction = 0
-                    valid = true
+                    return true
                 } else {
-                    battleUi.printBoard(pkm1: pkm1, pkm2: pkm2, text: "You have no PP left for this move!")
+                    battleUi.printBoard(pokemonB: userPokemon, pokemonF: pcPokemon, text: "You have no PP left for this move!")
                 }
             } else {
-                print("Invalid input")
+                return false
             }
         }
     }
 
-    static func bagChoice(pkm1: Pokemon, pkm2: Pokemon, trainer: Trainer) -> Bool {
+    static func bagChoice(userPokemon: Pokemon, pcPokemon: Pokemon, trainer: Trainer) -> Bool {
         let bag = trainer.getBag()
         while true {
-            battleUi.printBattle(pkm1: pkm1, pkm2: pkm2)
+            battleUi.printBattle(pokemonB: userPokemon, pokemonF: pcPokemon)
             Menu.bagMenu(bag: bag)
 
             let input = readLine() ?? "0"
@@ -36,7 +35,7 @@ class PlayerActions {
                     let heal = bag.useItem(item: itemKey)!
                     trainer.getActivePokemon().changeHealth(amount: heal)
                     Music.musicPlayerHelper.play(song: Music.healM)
-                    battleUi.printBoard(pkm1: pkm1, pkm2: pkm2, text: "You used \(itemKey.getName())!")
+                    battleUi.printBoard(pokemonB: userPokemon, pokemonF: pcPokemon, text: "You used \(itemKey.getName())!")
                     userAction = 1
                     return true
                 }
@@ -49,9 +48,9 @@ class PlayerActions {
         }
     }
 
-    static func pokemonChoice(pkm1: Pokemon, pkm2: Pokemon, trainer: Trainer) -> Bool {
+    static func pokemonChoice(userPokemon: Pokemon, pcPokemon: Pokemon, trainer: Trainer) -> Bool {
         while true {
-            battleUi.printBattle(pkm1: pkm1, pkm2: pkm2)
+            battleUi.printBattle(pokemonB: userPokemon, pokemonF: pcPokemon)
             Menu.pokemonMenu(trainer: trainer)
 
             let input = readLine() ?? "0"
@@ -62,7 +61,7 @@ class PlayerActions {
                 if pokemon.getIsAlive(), pokemon.getName() != trainer.getActivePokemon().getName() {
                     trainer.setActivePokemon(index: i)
                     Music.musicPlayerHelper.play(song: Music.out)
-                    battleUi.printBoard(pkm1: pkm1, pkm2: pkm2, text: "You sent out \(pokemon.getName())!")
+                    battleUi.printBoard(pokemonB: userPokemon, pokemonF: pcPokemon, text: "You sent out \(pokemon.getName())!")
                     userAction = 2
                     return true
                 }
@@ -75,9 +74,9 @@ class PlayerActions {
         }
     }
 
-    static func runChoice(pkm1: Pokemon, pkm2: Pokemon) {
+    static func runChoice(userPokemon: Pokemon, pcPokemon: Pokemon) {
         while true {
-            battleUi.printBattle(pkm1: pkm1, pkm2: pkm2)
+            battleUi.printBattle(pokemonB: userPokemon, pokemonF: pcPokemon)
             Menu.runMenu()
 
             if readLine() == "1" { return }

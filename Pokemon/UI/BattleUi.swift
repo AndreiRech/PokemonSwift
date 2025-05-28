@@ -1,58 +1,58 @@
 import Foundation
 
 class BattleUi {
-    private var team1: [Pokemon]
-    private var team2: [Pokemon]
+    private var userTeam: [Pokemon]
+    private var pcTeam: [Pokemon]
     
     init() {
-        self.team1 = []
-        self.team2 = []
+        self.userTeam = []
+        self.pcTeam = []
     }
     
-    func setTeams(team1: [Pokemon], team2: [Pokemon]) {
-        self.team1 = team1
-        self.team2 = team2
+    func setTeams(userTeam: [Pokemon], pcTeam: [Pokemon]) {
+        self.userTeam = userTeam
+        self.pcTeam = pcTeam
     }
     
-    func printPokemon(pokemon1: Pokemon, pokemon2: Pokemon) {
-        let pkm1B = pokemon1.getSprite()[0]
-        let pkm2F = pokemon2.getSprite()[1]
+    func printPokemon(pokemonB: Pokemon, pokemonF: Pokemon) {
+        let pokemonSpriteB = pokemonB.getSprite()[0]
+        let pokemonSpriteF = pokemonF.getSprite()[1]
         
-        Auxiliars.printInLines(string1: pkm1B, string2: pkm2F, amount: 25)
+        Auxiliars.printInLines(string1: pokemonSpriteB, string2: pokemonSpriteF, amount: 25)
     }
     
-    func printBattle(pkm1: Pokemon, pkm2: Pokemon) {
+    func printBattle(pokemonB: Pokemon, pokemonF: Pokemon) {
         Auxiliars.clear()
-        hpBar(pokemon1: pkm1, pokemon2: pkm2)
+        hpBar(pokemonB: pokemonB, pokemonF: pokemonF)
         print("\n\n")
-        printPokemon(pokemon1: pkm1, pokemon2: pkm2)
+        printPokemon(pokemonB: pokemonB, pokemonF: pokemonF)
         print("\n")
     }
     
-    func printBoard(pkm1: Pokemon, pkm2: Pokemon, text: String, damage: Bool? = false) {
-        printBattle(pkm1: pkm1, pkm2: pkm2)
+    func printBoard(pokemonB: Pokemon, pokemonF: Pokemon, text: String, damage: Bool? = false) {
+        printBattle(pokemonB: pokemonB, pokemonF: pokemonF)
         Menu.runningMenu(text: text)
         
         sleep(2)
     }
     
-    func hpBar(pokemon1: Pokemon, pokemon2: Pokemon) {
-        let hp1 = pokemon1.getHealth()
-        let hp2 = pokemon2.getHealth()
+    func hpBar(pokemonB: Pokemon, pokemonF: Pokemon) {
+        let hpB = pokemonB.getHealth()
+        let hpF = pokemonF.getHealth()
         
-        let currentHp1 = pokemon1.getCurrentHealth()
-        let currentHp2 = pokemon2.getCurrentHealth()
+        let currentHpB = pokemonB.getCurrentHealth()
+        let currentHpF = pokemonF.getCurrentHealth()
         
-        let pkmName1 = pokemon1.getName()
-        let pkmName2 = pokemon2.getName()
+        let pokemonNameB = pokemonB.getName()
+        let pokemonNameF = pokemonF.getName()
         
-        let bar1 = createHpBar(currentHp: currentHp1, maxHp: hp1, pkmName: pkmName1, team: team1)
-        let bar2 = createHpBar(currentHp: currentHp2, maxHp: hp2, pkmName: pkmName2, team: team2)
+        let barB = createHpBar(currentHp: currentHpB, maxHp: hpB, pokemonName: pokemonNameB, team: userTeam)
+        let barF = createHpBar(currentHp: currentHpF, maxHp: hpF, pokemonName: pokemonNameF, team: pcTeam)
         
-        Auxiliars.printInLines(string1: bar1, string2: bar2, amount: 50)
+        Auxiliars.printInLines(string1: barB, string2: barF, amount: 50)
     }
     
-    func createHpBar(currentHp: Int, maxHp: Int, pkmName: String, team: [Pokemon]) -> String {
+    func createHpBar(currentHp: Int, maxHp: Int, pokemonName: String, team: [Pokemon]) -> String {
         let hpRatio = Double(currentHp) / Double(maxHp)
         let barLength = 10
         var filledBlocks = Int(hpRatio * Double(barLength))
@@ -67,7 +67,7 @@ class BattleUi {
         
         let redCircles = String(repeating: "🔴", count: count)
         let whiteCircles = String(repeating: "⚪️", count: 3 - count)
-        let fullTop = pkmName + "                         " + redCircles + whiteCircles
+        let fullTop = pokemonName + "                         " + redCircles + whiteCircles
         
         var color: String = ""
         if hpRatio > 0.50 {

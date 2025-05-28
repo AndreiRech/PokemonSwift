@@ -1,14 +1,14 @@
 class PcActions {
-    static func turn(trainer1: Trainer, trainer2: Trainer) {
-        let enemy = trainer1.getActivePokemon()
-        let pc = trainer2.getActivePokemon()
+    static func turn(user: Trainer, pc: Trainer) {
+        let userPokemon = user.getActivePokemon()
+        let pcPokemon = pc.getActivePokemon()
         
-        let bestMove = chooseMove(enemy: enemy, pc: pc)
+        let bestMove = chooseMove(userPokemon: userPokemon, pcPokemon: pcPokemon)
         
         print("Best move: \(bestMove.getName())")
         
-        let probableDamage = MoveManager.calculateDamage(from: pc, with: bestMove, to: enemy)
-        let seeKill = probableDamage >= enemy.getCurrentHealth()
+        let probableDamage = MoveManager.calculateDamage(from: pcPokemon, with: bestMove, to: userPokemon)
+        let seeKill = probableDamage >= userPokemon.getCurrentHealth()
         
         print("See kill: \(seeKill)")
         
@@ -17,20 +17,20 @@ class PcActions {
             return
         }
         
-        if shouldHeal(trainer: trainer2, enemy: enemy, pc: pc) {
+        if shouldHeal(trainer: pc, userPokemon: userPokemon, pcPokemon: pcPokemon) {
             print("Should heal")
-            if let item =  heal(trainer: trainer2, pokemon: pc) {
+            if let item =  heal(trainer: pc, pokemon: pcPokemon) {
                 print("Healed with \(item.getName())")
                 pcUsedMove = nil
                 Music.musicPlayerHelper.play(song: Music.healM)
-                battleUi.printBoard(pkm1: enemy, pkm2: pc, text: "Your opponent used \(item.getName())!")
+                battleUi.printBoard(pokemonB: userPokemon, pokemonF: pcPokemon, text: "Your opponent used \(item.getName())!")
                 return
             }
         }
         
-        if shouldSwitch(trainer: trainer2, enemy: enemy, pc: pc) {
+        if shouldSwitch(trainer: pc, userPokemon: userPokemon, pcPokemon: pcPokemon) {
             print("Should switch")
-            if let new = changePokemon(team: trainer2.getTeam(), activePokemon: pc) {
+            if let new = changePokemon(team: pc.getTeam(), activePokemon: pcPokemon) {
                 print("Switched to \(new.getName())")
                 pcNewPokemon = new
                 pcUsedMove = nil
@@ -96,12 +96,12 @@ class PcActions {
         return bestPokemon
     }
     
-    private static func chooseMove(enemy: Pokemon, pc: Pokemon) -> Move {
-        let weakness = enemy.getWeakness()
-        var bestMove: Move = pc.getMoves()[0]
+    private static func chooseMove(userPokemon: Pokemon, pcPokemon: Pokemon) -> Move {
+        let weakness = userPokemon.getWeakness()
+        var bestMove: Move = pcPokemon.getMoves()[0]
         var bestDamage = 0.0
         
-        for move in pc.getMoves() {
+        for move in pcPokemon.getMoves() {
             guard move.getPp() > 0 else { continue }
             let type = move.getType()
             let power = move.getPower()
@@ -118,36 +118,32 @@ class PcActions {
         return bestMove
     }
     
-    private static func shouldHeal(trainer: Trainer, enemy: Pokemon, pc: Pokemon) -> Bool {
-        let enemyTypes = enemy.getType()
-        let pcWeakness = pc.getWeakness()
-        let pcHP = pc.getCurrentHealth()
+    private static func shouldHeal(trainer: Trainer, userPokemon: Pokemon, pcPokemon: Pokemon) -> Bool {
+        let enemyTypes = userPokemon.getType()
+        let pcWeakness = pcPokemon.getWeakness()
+        let pcHP = pcPokemon.getCurrentHealth()
 
         let totalAlive = trainer.getTeam().filter { $0.getIsAlive() }.count
-        print("totalAlive: \(totalAlive)")
-        if totalAlive == 1 && enemy.getCurrentHealth() < enemy.getHealth() / 2 { return true }
-        if totalAlive == 1 && pcHP <= pc.getHealth() / 2 { return true }
+        
+        if totalAlive == 1 && userPokemon.getCurrentHealth() < userPokemon.getHealth() / 2 { return true }
+        if totalAlive == 1 && pcHP <= pcPokemon.getHealth() / 2 { return true }
         
         for type in enemyTypes {
             if let multiplier = pcWeakness[type], multiplier >= 2.0 { return false }
         }
         
-        print("pcHP <= pc.getHealth() / 4: \(pcHP <= pc.getHealth() / 4)")
-        if pcHP <= pc.getHealth() / 4 { return true }
+        if pcHP <= pcPokemon.getHealth() / 4 { return true }
         
         return false
     }
     
-    private static func shouldSwitch(trainer: Trainer, enemy: Pokemon, pc: Pokemon) -> Bool {
-        let pcHP = pc.getCurrentHealth()
+    private static func shouldSwitch(trainer: Trainer, userPokemon: Pokemon, pcPokemon: Pokemon) -> Bool {
+        let pcHP = pcPokemon.getCurrentHealth()
         let team = trainer.getTeam()
         
         let random = Int.random(in: 1...100)
-        print("random: \(random)")
         if userAction == 2 && random > 50 {
-            print("> 50")
-            
-            let types = enemy.getType()
+            let types = userPokemon.getType()
             
             for pokemon in team where pokemon.getIsAlive() {
                 let weakness = pokemon.getWeakness()
@@ -159,8 +155,6 @@ class PcActions {
                     }
                 }
 
-                print("pokemon name: \(pokemon.getName())")
-                print("total multiplier: \(totalMultiplier)")
                 if totalMultiplier < 1.0 {
                     return true
                 }
@@ -168,12 +162,12 @@ class PcActions {
         }
         
         if let userUsedMove {
-            let probableDamage = MoveManager.calculateDamage(from: enemy, with: userUsedMove, to: pc)
+            let probableDamage = MoveManager.calculateDamage(from: userPokemon, with: userUsedMove, to: pcPokemon)
             
             if probableDamage >= pcHP {
                 for pokemon in team {
                     guard pokemon.getIsAlive() else { continue }
-                    let damage = MoveManager.calculateDamage(from: enemy, with: userUsedMove, to: pokemon)
+                    let damage = MoveManager.calculateDamage(from: userPokemon, with: userUsedMove, to: pokemon)
                     if damage <= pokemon.getCurrentHealth() * 3 / 10 { return true }
                 }
             }

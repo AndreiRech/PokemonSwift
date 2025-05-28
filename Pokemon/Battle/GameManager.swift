@@ -1,21 +1,21 @@
 class GameManager {
-    static func game(trainer1: Trainer, trainer2: Trainer) {
-        team1 = trainer1.getTeam()
-        team2 = trainer2.getTeam()
+    static func game(user: Trainer, pc: Trainer) {
+        userTeam = user.getTeam()
+        pcTeam = pc.getTeam()
         
-        battleUi.setTeams(team1: team1, team2: team2)
+        battleUi.setTeams(userTeam: userTeam, pcTeam: pcTeam)
         
         Music.musicPlayer.play(song: Music.battle)
         
         repeat {
             // Estado atual do jogo + Turno do Usuario
-            BattleManager.battle(trainer1: trainer1, trainer2: trainer2)
+            BattleManager.battle(user: user, pc: pc)
             
             // Turno do PC
-            PcActions.turn(trainer1: trainer1, trainer2: trainer2)
+            PcActions.turn(user: user, pc: pc)
             
             // Calcular Resutado
-            ResultCalculator.calculateResults(trainer1: trainer1, trainer2: trainer2)
+            ResultCalculator.calculateResults(user: user, pc: pc)
             
             userUsedMove = nil
             pcUsedMove = nil

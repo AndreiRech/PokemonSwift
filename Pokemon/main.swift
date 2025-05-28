@@ -1,14 +1,14 @@
 // PC's to choose the pokemons
-let pc = Pc()
+let pc1 = Pc()
 let pc2 = Pc()
 
 // Trainers
-var trainer1 = Trainer(id: 1)
-var trainer2 = Trainer(id: 2)
+var user = Trainer(id: 1)
+var pc = Trainer(id: 2)
 
 // Actual teams
-var team1: [Pokemon] = []
-var team2: [Pokemon] = []
+var userTeam: [Pokemon] = []
+var pcTeam: [Pokemon] = []
 
 // Used Moves
 var userUsedMove: Move?
@@ -26,8 +26,8 @@ var victory: Trainer?
 var battleUi = BattleUi()
 
 // Build team
-Menu.buildTeam(trainer: trainer1, pc: pc)
-Menu.buildTeam(trainer: trainer2, pc: pc2)
+Menu.buildTeam(trainer: user, pc: pc1)
+Menu.buildTeam(trainer: pc, pc: pc2)
 
 // Play the game
-GameManager.game(trainer1: trainer1, trainer2: trainer2)
+GameManager.game(user: user, pc: pc)
